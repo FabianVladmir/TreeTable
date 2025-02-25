@@ -1,0 +1,33 @@
+[
+    {
+      "category": "Best Rock Performance",
+      "artist": null,
+      "title": null,
+      "label": null,
+      "__children": [
+        {
+          "title": "Don't Wanna Fight",
+          "artist": "Alabama Shakes",
+          "label": "ATO Records",
+          "__children": [
+            { "title": "Track 1" },
+            { "title": "Track 2" }
+          ]
+        }
+      ]
+    },
+    {
+      "category": "Best Metal Performance",
+      "__children": [
+        {
+          "title": "Cirice",
+          "artist": "Ghost",
+          "label": "Loma Vista Recordings",
+          "__children": [
+            { "title": "Track 1" },
+            { "title": "Track 2" }
+          ]
+        }
+      ]
+    }
+  ]
