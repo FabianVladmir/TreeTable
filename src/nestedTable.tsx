@@ -57,7 +57,6 @@ const getSubRows = (row: any): any[] | undefined => {
   return undefined;
 };
 
-
 // Transforma los datos
 
 const transformRow = (  
@@ -119,6 +118,9 @@ const transformRow = (
       return transformRow(child,myIndex,idx)
     });
   }
+  else {
+    transformed.__children = [];
+  }
   return transformed;
 };
 
@@ -155,6 +157,31 @@ const ExampleComponent = () => {
   const [error, setError] = useState(null);
 
   const hotTableRef = useRef<HotTable>(null);
+
+  // useEffect(() => {
+  //   if (!isLoading && hotTableRef.current && tableData.length) {
+  //     const hot = hotTableRef.current.hotInstance;
+  //     const nestedRowsPlugin = hot.getPlugin('nestedRows');
+      
+  //     if (
+  //       nestedRowsPlugin &&
+  //       nestedRowsPlugin.collapsingUI &&
+  //       typeof nestedRowsPlugin.collapsingUI.toggleRowExpansion === 'function'
+  //     ) {
+  //       // Expand each top-level row that has children
+  //       tableData.forEach((row, rowIndex) => {
+  //         if (row.__children && row.__children.length > 0) {
+  //           // Pass `true` as second arg => expand, `false` => collapse
+  //           nestedRowsPlugin.collapsingUI.toggleRowExpansion(rowIndex, true);
+  //         }
+  //       });
+  //     }
+  //   }
+  // }, [isLoading, tableData]);
+  
+  
+
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -177,6 +204,7 @@ const ExampleComponent = () => {
   
     fetchData();
   }, []);
+  
 
   if (isLoading) return <div>Loading data...</div>;
   if (error) return <div>Error: {error}</div>;
@@ -186,6 +214,8 @@ const ExampleComponent = () => {
     <HotTable
       ref={hotTableRef} 
       data={tableData}
+      stretchH='all'
+      colWidths={[7, 1, 1, 1, 1, 1, 1, 1]}
       nestedRows={true}
       colHeaders={[
         'Funcion', 
