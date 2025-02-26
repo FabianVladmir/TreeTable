@@ -4,10 +4,9 @@ import 'handsontable/styles/handsontable.css';
 import 'handsontable/styles/ht-theme-main.css';
 import './styleTable.css';
 import { useEffect, useRef, useState } from 'react';
+import Handsontable from 'handsontable';
 
 registerAllModules();
-
-
 
 /*
  * Funcion recursiva
@@ -61,21 +60,91 @@ const getSubRows = (row: any): any[] | undefined => {
 
 // Transforma los datos
 
-const transformRow = (row: any) => {
-  const transformed = {
+const transformRow = (  
+  row: any,
+  parentIndex = '',
+  childIndex = 0
+) => {
+  let level = 0;
+  if (row.tipoGasto) level = 1;
+  if (row.nombreCuenta) level = 2;
+
+  let myIndex = '';
+
+  if (level === 1) {
+    // lvl 1 segment0 => "64"
+    const firstCuenta = row.cuentas?.[0];
+    if (firstCuenta?.detalles?.segment0) {
+      myIndex = firstCuenta.detalles.segment0.substring(0, 2);
+    }
+  } else if (level === 2) {
+    // lvl 2 "64a", "64b", etc.
+    const letters = 'abcdefghijklmnopqrstuvwxyz';
+    myIndex = parentIndex + letters[childIndex];
+  }
+
+  let dim1 = 'X';
+  let dim2 = 'X';
+  let dim3 = 'X';
+  let dim4 = 'X';
+  let fechaReferencia = 'X';
+  let fechaVenc = 'X';
+
+  if (row.detalles) {
+    dim1 = row.detalles.dim1 || 'X';
+    dim2 = row.detalles.dim2 || 'X';
+    dim3 = row.detalles.dim3 || 'X';
+    dim4 = row.detalles.dim4 || 'X';
+    fechaReferencia = row.detalles.fechaReferencia || 'X';
+    fechaVenc = row.detalles.fechaVenc || 'X';
+  }
+
+  const transformed : any= {
+    level,
     funcion: getFuncionLabel(row),
-    resultadoFuncion: computeResultadoFuncion(row)
+    resultadoFuncion: computeResultadoFuncion(row),
+    myIndex,
+    dim1,
+    dim2,
+    dim3,
+    dim4,
+    fechaReferencia,
+    fechaVenc,
   };
   
   const children = getSubRows(row);
   console.log("Children found:", children);
   if (children && Array.isArray(children)) {
-    transformed.__children = children.map(transformRow);
+    transformed.__children = children.map((child:any, idx: number) => {
+      return transformRow(child,myIndex,idx)
+    });
   }
   return transformed;
 };
 
 const transformData = (data: any[]) => data.map(transformRow);
+
+function shortDateRenderer(
+  instance: Handsontable.Core,
+  td: HTMLTableCellElement,
+  row: number,
+  col: number,
+  prop: string | number,
+  value: any,
+  cellProperties: Handsontable.CellProperties
+) {
+  let displayValue = 'X';  
+  
+  if (typeof value === 'string' && value.length >= 10) {
+    displayValue = value.substring(2, 10); // "YY-MM-DD"
+  }
+
+  
+  Handsontable.renderers.TextRenderer.apply(
+    this,
+    [instance, td, row, col, prop, displayValue, cellProperties]
+  );
+}
 
 
 const ExampleComponent = () => {  
@@ -85,6 +154,7 @@ const ExampleComponent = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  const hotTableRef = useRef<HotTable>(null);
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -114,152 +184,88 @@ const ExampleComponent = () => {
 
   return (
     <HotTable
-      
-      className="ht-theme-main"
+      ref={hotTableRef} 
       data={tableData}
-      preventOverflow="horizontal"
-      rowHeaders={true}
-      colHeaders={['Funcion', 'Resultado Funcion']}
+      nestedRows={true}
+      colHeaders={[
+        'Funcion', 
+        'Resultado Funcion',
+        'Dim1',
+        'Dim2',
+        'Dim3',
+        'Dim4',
+        'Fecha Referencia',
+        'Fecha Vencimiento',
+      ]}
       columns={[
         { data: 'funcion' },
+        {
+          data: 'resultadoFuncion',
+          type: 'numeric',
+          numericFormat: { pattern: '0,0.00' },
+        },
+        { data: 'dim1' },
+        { data: 'dim2' },
+        { data: 'dim3' },
+        { data: 'dim4' },
         { 
-          data: 'resultadoFuncion', 
-          type: 'numeric', 
-          numericFormat: { pattern: '0,0.00' } 
-        }
+          data: 'fechaReferencia' ,
+          renderer: shortDateRenderer
+        
+        },
+        { 
+          data: 'fechaVenc',
+          renderer: shortDateRenderer 
+        },
       ]}
-      nestedRows={true}
-      contextMenu={true}
-      bindRowsWithHeaders={true}
-      autoWrapRow={true}
-      autoWrapCol={true}
-      autoColumnSize={true} 
-      manualColumnResize={true}
-      width="100%"          
+      
+      rowHeaders={(rowIndex: number) => {
+        const hot = hotTableRef.current?.hotInstance;
+        if (!hot) {
+          
+          return rowIndex + 1;
+        }
+        // Obtiene la fila 
+        const rowData = hot.getSourceDataAtRow(rowIndex);
+
+        // Si existe un indice personalizado (MyIndex) se muestra 
+        if (rowData?.myIndex) {
+          return rowData.myIndex;
+        }
+        return rowIndex + 1;
+      }}
+
+      cells={(row, col) => {
+        const hot = hotTableRef.current?.hotInstance;
+        if (!hot) return {};
+
+        const rowData: any = hot.getSourceDataAtRow(row);
+        if (!rowData) return {};
+
+        const cellProps: any = {};
+        
+        if (rowData.level === 0) {
+          cellProps.className = 'level-0';
+        } else if (rowData.level === 1) {
+          cellProps.className = 'level-1';
+        } 
+        // else (level===2) => no style
+        return cellProps;
+      }}
+      // Other standard settings
+      contextMenu
+      preventOverflow="horizontal"
+      autoWrapRow
+      autoWrapCol
+      autoColumnSize
+      manualColumnResize
+      width="100%"
       height="auto"
       licenseKey="non-commercial-and-evaluation"
-      // columns={[
-      //   { data: 'category', className: 'category-column' },
-      //   { data: 'artist', className: 'artist-column' },
-      //   { data: 'title', className: 'title-column' },
-      //   { data: 'album', className: 'album-column' },
-      //   { data: 'label', className: 'label-column' }
-      // ]}
-      // columns={[
-      //   { data: 'category' },
-      //   { data: 'artist' },
-      //   { data: 'title' },
-      //   { data: 'album' },
-      //   { data: 'label' }
-      // ]}
-      
-      
-      
+      className="ht-theme-main"
     />
   );
+
 };
 
 export default ExampleComponent;
-
-
-
-
-
-
-// const sourceDataObject = [
-//   {
-//     category: 'Best Rock Performance',
-//     artist: null,
-//     title: null,
-//     label: null,
-//     __children: [
-//       {
-//         title: "Don't Wanna Fight",
-//         artist: 'Alabama Shakes',
-//         label: 'ATO Records',
-//         __children: [
-//           { title: 'Track 1' },
-//           { title: 'Track 2' },
-//         ],
-//       },
-//       {
-//         title: 'What Kind Of Man',
-//         artist: 'Florence & The Machine',
-//         label: 'Republic',
-//         __children: [
-//           { title: 'Track 1' },
-//           { title: 'Track 2' },
-//         ],
-//       },
-//     ],
-//   },
-//   {
-//     category: 'Best Metal Performance',
-//     __children: [
-//       {
-//         title: 'Cirice',
-//         artist: 'Ghost',
-//         label: 'Loma Vista Recordings',
-//         __children: [
-//           { title: 'Track 1' },
-//           { title: 'Track 2' },
-//         ],
-//       },
-//       {
-//         title: 'Identity',
-//         artist: 'August Burns Red',
-//         label: 'Fearless Records',
-//         __children: [
-//           { title: 'Track 1' },
-//           { title: 'Track 2' },
-//         ],
-//       },
-//     ],
-//   },
-//   {
-//     category: 'Best Rock Song',
-//     __children: [
-//       {
-//         title: "Don't Wanna Fight",
-//         artist: 'Alabama Shakes',
-//         label: 'ATO Records',
-//         __children: [
-//           { title: 'Track 1' },
-//           { title: 'Track 2' },
-//         ],
-//       },
-//       {
-//         title: "Ex's & Oh's",
-//         artist: 'Elle King',
-//         label: 'RCA Records',
-//         __children: [
-//           { title: 'Track 1' },
-//           { title: 'Track 2' },
-//         ],
-//       },
-//     ],
-//   },
-//   {
-//     category: 'Best Rock Album',
-//     __children: [
-//       {
-//         title: 'Drones',
-//         artist: 'Muse',
-//         label: 'Warner Bros. Records',
-//         __children: [
-//           { title: 'Track 1' },
-//           { title: 'Track 2' },
-//         ],
-//       },
-//       {
-//         title: 'Chaos And The Calm',
-//         artist: 'James Bay',
-//         label: 'Republic',
-//         __children: [
-//           { title: 'Track 1' },
-//           { title: 'Track 2' },
-//         ],
-//       },
-//     ],
-//   },
-// ];

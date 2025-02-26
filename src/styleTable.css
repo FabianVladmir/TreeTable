@@ -1,4 +1,11 @@
-/* styles.css */
+.level-0 {
+  background-color: #fff2cc !important; 
+}
+
+.level-1 {
+  background-color: #d9ead3 !important; 
+} 
+
 .table-container {
     overflow-x: auto;
     max-width: 100%;
@@ -7,12 +14,11 @@
   }
   
   .responsive-table {
-    min-width: 600px; /* Minimum table width */
+    min-width: 600px; 
   }
 
-
   .responsive-table .htCore {
-    table-layout: auto !important; /* Allows columns to resize freely */
+    table-layout: auto !important; 
   }
   
   .responsive-table .htCore td {
@@ -26,47 +32,35 @@
     cursor: col-resize;
   }
   
-  /* Column resize handle indicator */
+  
   .handsontable.columnResizing {
     cursor: col-resize !important;
   }
-  /*
-  .responsive-table .htCore td {
-    word-break: break-word;
-    padding: 8px 12px;
-    font-size: 14px;
-  }
+
+
+/* celdas de cabecera de fila */
+.ht_clone_left .htCore th {
+  background-color: #f7f7f7;
+  color: #333;
+  text-align: center;
+  font-weight: bold;  
+  width: 60px; 
   
-  
-  .category-column { min-width: 180px; }
-  .artist-column { min-width: 150px; }
-  .title-column { min-width: 150px; }
-  .album-column { min-width: 150px; }
-  .label-column { min-width: 150px; }
-  
-  
-  @media screen and (max-width: 768px) {
-    .responsive-table .htCore td {
-      font-size: 12px;
-      padding: 6px 8px;
-    }
-    
-    .category-column { min-width: 140px; }
-    .artist-column { min-width: 120px; }
-    .title-column { min-width: 120px; }
-    .album-column { min-width: 120px; }
-    .label-column { min-width: 120px; }
-  }
-  
-  @media screen and (max-width: 480px) {
-    .responsive-table .htCore td {
-      font-size: 11px;
-      padding: 4px 6px;
-    }
-    
-    .category-column { min-width: 120px; }
-    .artist-column { min-width: 100px; }
-    .title-column { min-width: 100px; }
-    .album-column { min-width: 100px; }
-    .label-column { min-width: 100px; }
-  }*/
+}
+
+/*  boton expandir/contraer */
+.ht_nestingButton {
+  color: #007bff;   
+  cursor: pointer;
+  font-size: 14px;
+}
+
+/* Contenido de los botones + / -: */
+.ht_nestingButton--collapsed::before {
+  content: "+";
+}
+.ht_nestingButton--expanded::before {
+  content: "-";
+}
+
+
