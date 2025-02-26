@@ -32,6 +32,29 @@ const computeResultadoFuncion = (row: any): number => {
   return 0;
 };
 
+/* Obtiene el nombre de todos los centros de costos */
+function gatherAllCostCenters(data: any[]): string[] {
+  const costCenterSet = new Set<string>();
+
+  function traverse(node: any) {
+    // if (node.detalles && node.detalles.nombreCentroCostos) {
+    //   costCenterSet.add(node.detalles.nombreCentroCostos);
+    // }
+    if (node.detalles?.nombreCentroCostos) {
+      costCenterSet.add(node.detalles.nombreCentroCostos.trim());
+    }
+
+    if (node.tiposDeGasto) {
+      node.tiposDeGasto.forEach(traverse);
+    }
+    if (node.cuentas) {
+      node.cuentas.forEach(traverse);
+    }    
+  }
+
+  data.forEach(traverse);
+  return [...costCenterSet];
+}
 
 /**
  * Determina que etiqueta se mostrara":
@@ -88,6 +111,7 @@ const transformRow = (
   let dim4 = 'X';
   let fechaReferencia = 'X';
   let fechaVenc = 'X';
+  let _centroCostos = '';
 
   if (row.detalles) {
     dim1 = row.detalles.dim1 || 'X';
@@ -96,6 +120,10 @@ const transformRow = (
     dim4 = row.detalles.dim4 || 'X';
     fechaReferencia = row.detalles.fechaReferencia || 'X';
     fechaVenc = row.detalles.fechaVenc || 'X';
+
+    if(level === 2 && row.detalles.nombreCentroCostos){
+      _centroCostos = row.detalles.nombreCentroCostos.trim();
+    }
   }
 
   const transformed : any= {
@@ -109,13 +137,14 @@ const transformRow = (
     dim4,
     fechaReferencia,
     fechaVenc,
+    _centroCostos,
   };
   
   const children = getSubRows(row);
   console.log("Children found:", children);
   if (children && Array.isArray(children)) {
     transformed.__children = children.map((child:any, idx: number) => {
-      return transformRow(child,myIndex,idx)
+      return transformRow(child, myIndex, idx)
     });
   }
   else {
@@ -143,8 +172,7 @@ function shortDateRenderer(
 
   
   Handsontable.renderers.TextRenderer.apply(
-    this,
-    [instance, td, row, col, prop, displayValue, cellProperties]
+    this, [instance, td, row, col, prop, displayValue, cellProperties]
   );
 }
 
@@ -153,34 +181,28 @@ const ExampleComponent = () => {
 
   // const hotTableRef = useRef(null);
   const [tableData, setTableData] = useState([]);
+  const [costCenters, setCostCenters] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  const hotTableRef = useRef<HotTable>(null);
-
-  // useEffect(() => {
-  //   if (!isLoading && hotTableRef.current && tableData.length) {
-  //     const hot = hotTableRef.current.hotInstance;
-  //     const nestedRowsPlugin = hot.getPlugin('nestedRows');
-      
-  //     if (
-  //       nestedRowsPlugin &&
-  //       nestedRowsPlugin.collapsingUI &&
-  //       typeof nestedRowsPlugin.collapsingUI.toggleRowExpansion === 'function'
-  //     ) {
-  //       // Expand each top-level row that has children
-  //       tableData.forEach((row, rowIndex) => {
-  //         if (row.__children && row.__children.length > 0) {
-  //           // Pass `true` as second arg => expand, `false` => collapse
-  //           nestedRowsPlugin.collapsingUI.toggleRowExpansion(rowIndex, true);
-  //         }
-  //       });
-  //     }
-  //   }
-  // }, [isLoading, tableData]);
-  
+  const [error, setError] = useState<string | null>(null);
+  const hotTableRef = useRef<HotTable>(null);  
   
 
+  useEffect(() => {
+    if (!isLoading && hotTableRef.current && tableData.length) {
+      const hot = hotTableRef.current.hotInstance;
+      const nestedRowsPlugin = hot.getPlugin('nestedRows');
+  
+      // Check if the plugin is available
+      if (nestedRowsPlugin?.collapsingUI?.toggleRowExpansion) {
+        // Expand each top-level row
+        tableData.forEach((row, rowIndex) => {
+          if (row.__children && row.__children.length > 0) {
+            nestedRowsPlugin.collapsingUI.toggleRowExpansion(rowIndex, true);
+          }
+        });
+      }
+    }
+  }, [isLoading, tableData]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -190,10 +212,11 @@ const ExampleComponent = () => {
   
         const data = await response.json();
   
+        const centers = gatherAllCostCenters(data);
+        setCostCenters(centers);
+        
         // Transforma los datos
-        const transformed = transformData(data);
-  
-        // Almacena los datos transformados
+        const transformed = transformData(data);        
         setTableData(transformed);
       } catch (err) {
         setError(err.message);
@@ -208,46 +231,80 @@ const ExampleComponent = () => {
 
   if (isLoading) return <div>Loading data...</div>;
   if (error) return <div>Error: {error}</div>;
-  console.log(tableData)
+  // console.log(tableData)
+
+  
+
+  const baseColumnasHeaders = [
+    'Funcion',
+    'Resultado',
+    'Dim1',
+    'Dim2',
+    'Dim3',
+    'Dim4',
+    'Fecha Ref',
+    'Fecha Venc',
+  ]
+
+  const baseColumna = [
+    { data: 'funcion' },
+    {
+      data: 'resultadoFuncion',
+      type: 'numeric',
+      numericFormat: { pattern: '0,0.00' },
+    },
+    { data: 'dim1' },
+    { data: 'dim2' },
+    { data: 'dim3' },
+    { data: 'dim4' },
+    {
+      data: 'fechaReferencia',
+      renderer: shortDateRenderer,
+    },
+    {
+      data: 'fechaVenc',
+      renderer: shortDateRenderer,
+    },
+  ]
+
+  // Por cada centro de costos crea una columna y muestra $ si hay un valor o 'X'
+  const costCenterColHeaders = costCenters.map((cc) => cc);
+
+  
+  const costCenterColumns = costCenters.map((cc) => ({
+    data: (rowData: any) => {
+      if (!rowData || typeof rowData.level === 'undefined') {
+        return 'X'; // or blank
+      }
+      if (rowData.level === 2) {
+        
+        console.log('Comparing:', rowData._centroCostos, 'vs', cc);
+        return rowData._centroCostos === cc ? '$' : 'X';
+      }
+      return 'X';
+    },
+  }));  
+
+  console.log(costCenterColHeaders) // returned an array with 28 elements
+  console.log(costCenterColumns) // returned an array empty 28 index
+
+  // Combinacion
+  const allColHeaders = [...baseColumnasHeaders, ...costCenterColHeaders];
+  const allColumns = [...baseColumna, ...costCenterColumns];
 
   return (
     <HotTable
       ref={hotTableRef} 
       data={tableData}
-      stretchH='all'
-      colWidths={[7, 1, 1, 1, 1, 1, 1, 1]}
+      // stretchH='all'
+      // colWidths={[3, 1, 1, 0.5, 1, 1, 1, 1]}
       nestedRows={true}
-      colHeaders={[
-        'Funcion', 
-        'Resultado Funcion',
-        'Dim1',
-        'Dim2',
-        'Dim3',
-        'Dim4',
-        'Fecha Referencia',
-        'Fecha Vencimiento',
-      ]}
-      columns={[
-        { data: 'funcion' },
-        {
-          data: 'resultadoFuncion',
-          type: 'numeric',
-          numericFormat: { pattern: '0,0.00' },
-        },
-        { data: 'dim1' },
-        { data: 'dim2' },
-        { data: 'dim3' },
-        { data: 'dim4' },
-        { 
-          data: 'fechaReferencia' ,
-          renderer: shortDateRenderer
-        
-        },
-        { 
-          data: 'fechaVenc',
-          renderer: shortDateRenderer 
-        },
-      ]}
+      colHeaders={
+        allColHeaders
+      }
+      columns={
+        allColumns
+      }
       
       rowHeaders={(rowIndex: number) => {
         const hot = hotTableRef.current?.hotInstance;
@@ -270,7 +327,10 @@ const ExampleComponent = () => {
         if (!hot) return {};
 
         const rowData: any = hot.getSourceDataAtRow(row);
-        if (!rowData) return {};
+
+        if (!rowData || typeof rowData.level === 'undefined') {
+          return {};
+        }
 
         const cellProps: any = {};
         

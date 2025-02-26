@@ -16,7 +16,7 @@
   white-space: normal !important;
 }
 
-/* Column handle styling */
+/* Separador de columnas*/
 .ht_master .wtHolder {
   cursor: col-resize;
 }
