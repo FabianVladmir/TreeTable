@@ -1,0 +1,18 @@
+.button-container {
+    margin: 10px 0;
+    display: flex;
+    gap: 10px;
+  }
+  
+  .btn-collapse, .btn-expand {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: opacity 0.3s;
+  }
+  
+  .btn-collapse { background-color: #f44336; color: white; }
+  .btn-expand { background-color: #4CAF50; color: white; }
+  
+  .btn-collapse:hover, .btn-expand:hover { opacity: 0.9; }

@@ -3,7 +3,8 @@ import { createRoot } from 'react-dom/client'
 
 
 // import Apppp from './Content'
-import ExampleComponent from './nestedTable'
+// import ExampleComponent from './nestedTable'
+import TableTest from './TestTable'
 // import TestFunctions from './TestTable'
 
 
@@ -14,11 +15,9 @@ import ExampleComponent from './nestedTable'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    {/* <MyTable/> */}
-    {/* <MyNewTable /> */}
-    {/* <MusicAwardTable data={sourceDataObject} /> */}
-    {/* <Apppp/> */}
-    <ExampleComponent/>
+    
+    {/* <ExampleComponent/> */}
+    <TableTest/>
     {/* <TestFunctions/> */}
   </StrictMode>,
 )

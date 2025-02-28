@@ -37,9 +37,7 @@ function gatherAllCostCenters(data: any[]): string[] {
   const costCenterSet = new Set<string>();
 
   function traverse(node: any) {
-    // if (node.detalles && node.detalles.nombreCentroCostos) {
-    //   costCenterSet.add(node.detalles.nombreCentroCostos);
-    // }
+   
     if (node.detalles?.nombreCentroCostos) {
       costCenterSet.add(node.detalles.nombreCentroCostos.trim());
     }
@@ -192,9 +190,9 @@ const ExampleComponent = () => {
       const hot = hotTableRef.current.hotInstance;
       const nestedRowsPlugin = hot.getPlugin('nestedRows');
   
-      // Check if the plugin is available
+      
       if (nestedRowsPlugin?.collapsingUI?.toggleRowExpansion) {
-        // Expand each top-level row
+        // Despliega cada fila del nivel superior
         tableData.forEach((row, rowIndex) => {
           if (row.__children && row.__children.length > 0) {
             nestedRowsPlugin.collapsingUI.toggleRowExpansion(rowIndex, true);
@@ -207,8 +205,9 @@ const ExampleComponent = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch('/data.json');
-        if (!response.ok) throw new Error('Failed to fetch data');
+        const response = await fetch('/data6_prod.json');
+        console.log(response)
+        if (!response.ok) throw new Error('Fallo al cargar los datos');
   
         const data = await response.json();
   
@@ -351,8 +350,10 @@ const ExampleComponent = () => {
       manualColumnResize
       width="100%"
       height="auto"
+      //height="500px"
       licenseKey="non-commercial-and-evaluation"
       className="ht-theme-main"
+      // renderAllRows={false}
     />
   );
 
