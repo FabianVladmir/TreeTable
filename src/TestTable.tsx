@@ -1,146 +1,413 @@
-import React from 'react';
+// import { useRef, useState } from 'react';
+// import { HotTable } from '@handsontable/react-wrapper';
+// import { registerAllModules } from 'handsontable/registry';
+// import 'handsontable/styles/handsontable.css';
+// import 'handsontable/styles/ht-theme-main.css';
+
+// registerAllModules();
+
+// // interface TableData {
+// //   category?: string;
+// //   artist?: string | null;
+// //   title?: string | null;
+// //   label?: string | null;
+// //   dateOfPublish?: string;
+// //   sold?: boolean;
+// //   price?: number;
+// //   availability?: boolean;
+// //   store?: string | null;
+// //   __children?: TableData[];
+// //   __expanded? : boolean
+// // }
 
 
-interface Detalles {
-  debito: number;
-  credito: number;  
+// interface TableData {
+//   category?: string;
+//   artist?: string | null;
+//   title?: string | null;
+//   label?: string | null;
+//   album?: string;
+//   detail?: string;
+//   __children?: TableData[];
+// }
+// // Componente principal
+// const TableTest = () => {
+//   // Referencia al componente HotTable
+//   const hotTableComponentRef = useRef<any>(null);
+
+//   // Estado para controlar si la tabla está expandida o colapsada
+//   const [isExpanded, setIsExpanded] = useState(true);
+
+//   // Datos de ejemplo (similares al ejemplo que proporcionaste)
+//   // const sourceDataObject: TableData[] = [
+//   //   {
+//   //     category: 'Best Rock Performance',
+//   //     artist: null,
+//   //     title: null,
+//   //     label: null,
+//   //     dateOfPublish: '03/2024',
+//   //     sold: true,
+//   //     price: 0,
+//   //     availability: false,
+//   //     store: null,
+//   //     __children: [
+//   //       {
+//   //         title: "Don't Wanna Fight",
+//   //         artist: 'Alabama Shakes',
+//   //         label: 'ATO Records',
+//   //         dateOfPublish: '03/2024',
+//   //         sold: false,
+//   //         price: 60,
+//   //         availability: false,
+//   //         store: null,
+//   //       },
+//   //       {
+//   //         title: 'What Kind Of Man',
+//   //         artist: 'Florence & The Machine',
+//   //         label: 'Republic',
+//   //         dateOfPublish: '03/2024',
+//   //         sold: false,
+//   //         price: 70,
+//   //         availability: false,
+//   //         store: null,
+//   //       },
+//   //     ],
+//   //   },
+//   //   {
+//   //     category: 'Best Metal Performance',
+//   //     dateOfPublish: '03/2024',
+//   //     sold: false,
+//   //     price: 30,
+//   //     availability: false,
+//   //     store: null,
+//   //     __children: [
+//   //       {
+//   //         title: 'Cirice',
+//   //         artist: 'Ghost',
+//   //         label: 'Loma Vista Recordings',
+//   //         dateOfPublish: '03/2024',
+//   //         sold: false,
+//   //         price: 50,
+//   //         availability: false,
+//   //         store: null,
+//   //       },
+//   //       {
+//   //         title: 'Custer',
+//   //         artist: 'Slipknot',
+//   //         label: 'Roadrunner Records',
+//   //         dateOfPublish: '03/2024',
+//   //         sold: true,
+//   //         price: 0,
+//   //         availability: false,
+//   //         store: null,
+//   //       },
+//   //     ],
+//   //   },
+//   // ];
+
+//   const sourceDataObject: TableData[] = [
+//     {
+//       category: 'Best Rock Performance',
+//       artist: null,
+//       title: null,
+//       label: null,
+//       __children: [
+//         {
+//           title: "Don't Wanna Fight",
+//           artist: 'Alabama Shakes',
+//           label: 'ATO Records',
+//           __children: [
+//             {
+//               album: 'Sound & Color',
+//               __children: [
+//                 {
+//                   label: 'Edición Especial 2023',
+//                   __children: [
+//                     { detail: 'Versión Remasterizada' },
+//                     { detail: 'Incluye Bonus Tracks' }
+//                   ]
+//                 },
+//                 {
+//                   label: 'Vinilo Coleccionista',
+//                   __children: [
+//                     { detail: 'Grabación Analógica' },
+//                     { detail: 'Pack Premium' }
+//                   ]
+//                 }
+//               ]
+//             }
+//           ]
+//         },
+//         {
+//           title: 'What Kind Of Man',
+//           artist: 'Florence & The Machine',
+//           label: 'Republic',
+//           __children: [
+//             {
+//               album: 'How Big, How Blue, How Beautiful',
+//               __children: [
+//                 {
+//                   label: 'Deluxe Edition',
+//                   __children: [
+//                     { detail: 'Con DVD Documentary' },
+//                     { detail: 'Libro de Arte' }
+//                   ]
+//                 }
+//               ]
+//             }
+//           ]
+//         }
+//       ]
+//     },
+//     {
+//       category: 'Best Metal Performance',
+//       __children: [
+//         {
+//           title: 'Cirice',
+//           artist: 'Ghost',
+//           label: 'Loma Vista Recordings',
+//           __children: [
+//             {
+//               album: 'Meliora',
+//               __children: [
+//                 {
+//                   label: 'Edición de Lujo',
+//                   __children: [
+//                     { detail: '2 CDs + Blu-ray' },
+//                     { detail: 'Póster Exclusivo' }
+//                   ]
+//                 }
+//               ]
+//             }
+//           ]
+//         }
+//       ]
+//     }
+//   ];
+
+//   const selectionEnd = () => {
+//     // The Handsontable instance is stored under the `hotInstance` property of the wrapper component.
+//     if (hotTableComponentRef.current !== null) {
+//       let hot = hotTableComponentRef.current;
+//       let plu = hot.hotInstance.getPlugin('NestedRows').collapsingUI;
+//       console.log(plu);
+//       plu.collapseAll();
+//     }
+//   };
+
+//   // Función para alternar entre expandir y colapsar
+//   const toggleCollapse = () => {
+//     if (hotTableComponentRef.current) {
+//       const hotInstance = hotTableComponentRef.current.hotInstance;
+//       // console.log('HotInstance:', hotInstance);
+//       const nestedRowsPlugin = hotInstance.getPlugin('NestedRows');
+//       // console.log('NestedRows plugin:', nestedRowsPlugin);
+//       const collapsingUI = nestedRowsPlugin.collapsingUI;
+//       // console.log('CollapsingUI:', collapsingUI);
+
+//       if (collapsingUI) {
+//         if (isExpanded) {
+//           collapsingUI.collapseAll();          
+//         } else {
+//           collapsingUI.expandAll();
+          
+//           // setIsExpanded(true)
+//         }
+//         setIsExpanded(!isExpanded);
+//       } else {
+//         console.error('El collapsingUI no está definido');
+//       }
+//     }
+//   };
+
+//   return (
+//     <div>
+//       {/* Botón para expandir o colapsar */}
+//       <button onClick={toggleCollapse}>
+//         {isExpanded ? 'Comprimir' : 'Expandir'}
+//       </button>
+
+//       {/* Tabla Handsontable */}
+//       <HotTable
+//         ref={hotTableComponentRef}
+//         // ref={(instance) => {
+//         //   hotTableComponentRef.current = instance;
+//         // }}
+//         data={sourceDataObject}
+//         className="ht-theme-main"
+//         rowHeaders={true}
+//         colHeaders={[
+//           'Category',
+//           'Artist',
+//           'Title',
+//           'Label',
+//           'Date of Publish',
+//           'Sold',
+//           'Price',
+//           'Availability',
+//           'Store',
+//         ]}
+//         nestedRows={true}
+//         afterSelectionEnd={selectionEnd}
+//         autoWrapRow={true}
+//         autoWrapCol={true}
+//         height="auto"
+//         licenseKey="non-commercial-and-evaluation"
+//         columns={[
+//           { data: 'category' },
+//           { data: 'artist' },
+//           { data: 'title' },
+//           { data: 'label' },
+//           { data: 'dateOfPublish' },
+//           { data: 'sold' },
+//           { data: 'price' },
+//           { data: 'availability' },
+//           { data: 'store' },
+//         ]}
+//       />
+//     </div>
+//   );
+// };
+
+// export default TableTest;
+
+import { HotTable } from '@handsontable/react-wrapper';
+import { registerAllModules } from 'handsontable/registry';
+import 'handsontable/styles/handsontable.css';
+import 'handsontable/styles/ht-theme-main.css';
+import { useRef } from 'react';
+
+registerAllModules();
+
+interface TableData {
+  category?: string;
+  artist?: string | null;
+  title?: string | null;
+  label?: string | null;
+  album?: string;
+  detail?: string;
+  __children?: TableData[];
 }
 
-interface Cuenta {
-  nombreCuenta: string;
-  detalles: Detalles;
-}
 
-interface TipoGasto {
-  tipoGasto: string;
-  cuentas: Cuenta[];
-}
-
-interface CategoriaCuenta {
-  categoriaCuenta: string;
-  tiposDeGasto: TipoGasto[];
-}
-
-
-const computeResultadoFuncion = (row: any): number => {
-  if (row.detalles) {
-    return row.detalles.debito - row.detalles.credito;
-  } else if (row.tiposDeGasto) {
-    
-    return row.tiposDeGasto.reduce(
-      (sum: number, child: any) => sum + computeResultadoFuncion(child),
-      0
-    );
-  } else if (row.cuentas) {
-    
-    return row.cuentas.reduce(
-      (sum: number, child: any) => sum + computeResultadoFuncion(child),
-      0
-    );
-  }
-  return 0;
-};
-
-
-const getFuncionLabel = (row: any): string => {
-  if (row.categoriaCuenta) return row.categoriaCuenta;
-  if (row.tipoGasto) return row.tipoGasto;
-  if (row.nombreCuenta) return row.nombreCuenta;
-  return '';
-};
-
-const getSubRows = (row: any): any[] | undefined => {
-  if (row.tiposDeGasto) return row.tiposDeGasto;
-  if (row.cuentas) return row.cuentas;
-  return undefined;
-};
-
-
-const TestFunctions: React.FC = () => {
+const TableTest = () => {
+  const hotTableComponentRef = useRef<any>(null);
   
-  const sampleData: CategoriaCuenta = {
-    categoriaCuenta: "Test Categoria (Level 0)",
-    tiposDeGasto: [
-      {
-        tipoGasto: "Test Tipo Gasto (Level 1)",
-        cuentas: [
-          {
-            nombreCuenta: "Test Cuenta 1 (Level 2)",
-            detalles: { debito: 100, credito: 50 }
-          },
-          {
-            nombreCuenta: "Test Cuenta 2 (Level 2)",
-            detalles: { debito: 60, credito: 20 }  
-          }
-        ]
-      }
-    ]
+  const selectionEnd = () => {
+    // The Handsontable instance is stored under the `hotInstance` property of the wrapper component.
+    if (hotTableComponentRef.current !== null) {
+      let hot = hotTableComponentRef.current;
+      let plu = hot.hotInstance.getPlugin('NestedRows').collapsingUI;
+      console.log(plu);
+      plu.collapseAll();
+    }
   };
-
-  // Level 0 (CategoriaCuenta) tests:
-  const level0Resultado = computeResultadoFuncion(sampleData);
-  const level0Label = getFuncionLabel(sampleData);
-  const level0SubRows = getSubRows(sampleData);
-
-  // Level 1 (TipoGasto) tests:
-  const sampleTipo = sampleData.tiposDeGasto[0];
-  const level1Resultado = computeResultadoFuncion(sampleTipo);
-  const level1Label = getFuncionLabel(sampleTipo);
-  const level1SubRows = getSubRows(sampleTipo);
-
-  // Level 2 (Cuenta) tests:
-  const sampleCuenta = sampleTipo.cuentas[0];
-  const level2Resultado = computeResultadoFuncion(sampleCuenta);
-  const level2Label = getFuncionLabel(sampleCuenta);
-  const level2SubRows = getSubRows(sampleCuenta);
+  const sourceDataObject: TableData[] = [
+    {
+      category: 'Best Rock Performance',
+      artist: null,
+      title: null,
+      label: null,
+      __children: [
+        {
+          title: "Don't Wanna Fight",
+          artist: 'Alabama Shakes',
+          label: 'ATO Records',
+          __children: [
+            {
+              album: 'Sound & Color',
+              __children: [
+                {
+                  label: 'Edición Especial 2023',
+                  __children: [
+                    { detail: 'Versión Remasterizada' },
+                    { detail: 'Incluye Bonus Tracks' }
+                  ]
+                },
+                {
+                  label: 'Vinilo Coleccionista',
+                  __children: [
+                    { detail: 'Grabación Analógica' },
+                    { detail: 'Pack Premium' }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          title: 'What Kind Of Man',
+          artist: 'Florence & The Machine',
+          label: 'Republic',
+          __children: [
+            {
+              album: 'How Big, How Blue, How Beautiful',
+              __children: [
+                {
+                  label: 'Deluxe Edition',
+                  __children: [
+                    { detail: 'Con DVD Documentary' },
+                    { detail: 'Libro de Arte' }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      category: 'Best Metal Performance',
+      __children: [
+        {
+          title: 'Cirice',
+          artist: 'Ghost',
+          label: 'Loma Vista Recordings',
+          __children: [
+            {
+              album: 'Meliora',
+              __children: [
+                {
+                  label: 'Edición de Lujo',
+                  __children: [
+                    { detail: '2 CDs + Blu-ray' },
+                    { detail: 'Póster Exclusivo' }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ];
 
   return (
-    <div style={{ padding: '1rem', fontFamily: 'sans-serif' }}>
-      <h2>Test Results for Helper Functions</h2>
-
-      <div style={{ marginBottom: '1rem' }}>
-        <h3>Level 0 (categoriaCuenta)</h3>
-        <p>
-          <strong>Label:</strong> {level0Label}
-        </p>
-        <p>
-          <strong>Resultado Funcion:</strong> {level0Resultado}
-        </p>
-        <p>
-          <strong>SubRows:</strong>{" "}
-          {level0SubRows ? JSON.stringify(level0SubRows, null, 2) : "None"}
-        </p>
-      </div>
-
-      <div style={{ marginBottom: '1rem' }}>
-        <h3>Level 1 (tipoGasto)</h3>
-        <p>
-          <strong>Label:</strong> {level1Label}
-        </p>
-        <p>
-          <strong>Resultado Funcion:</strong> {level1Resultado}
-        </p>
-        <p>
-          <strong>SubRows:</strong>{" "}
-          {level1SubRows ? JSON.stringify(level1SubRows, null, 2) : "None"}
-        </p>
-      </div>
-
-      <div style={{ marginBottom: '1rem' }}>
-        <h3>Level 2 (nombreCuenta)</h3>
-        <p>
-          <strong>Label:</strong> {level2Label}
-        </p>
-        <p>
-          <strong>Resultado Funcion:</strong> {level2Resultado}
-        </p>
-        <p>
-          <strong>SubRows:</strong>{" "}
-          {level2SubRows ? JSON.stringify(level2SubRows, null, 2) : "None"}
-        </p>
-      </div>
-    </div>
+    <HotTable
+      data={sourceDataObject}
+      ref={hotTableComponentRef}
+      className="ht-theme-main"
+      preventOverflow="horizontal"
+      rowHeaders={true}
+      colHeaders={['Category', 'Artist', 'Title', 'Album', 'Label', 'Detail']}
+      nestedRows={true}
+      contextMenu={true}
+      bindRowsWithHeaders={true}
+      autoWrapRow={true}
+      autoWrapCol={true}
+      height="auto"
+      licenseKey="non-commercial-and-evaluation"
+      columns={[
+        { data: 'category' },
+        { data: 'artist' },
+        { data: 'title' },
+        { data: 'album' },
+        { data: 'label' },
+        { data: 'detail' }
+      ]}
+      afterSelectionEnd={selectionEnd}
+    />
   );
 };
 
-export default TestFunctions;
+export default TableTest;
