@@ -16,3 +16,8 @@
   .btn-expand { background-color: #4CAF50; color: white; }
   
   .btn-collapse:hover, .btn-expand:hover { opacity: 0.9; }
+
+
+#table-container {
+  height: 780px;
+}
