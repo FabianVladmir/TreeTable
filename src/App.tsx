@@ -1,7 +1,7 @@
 
 import './App.css'
 import { BrowserRouter, Link, Route, Routes } from 'react-router-dom';
-import ExampleComponent from './TablaPrueba';
+import ExampleComponent from './TablaBDPrueba';
 import TableTest from './TestTable';
 import CentroCostosComponent from './VerifaCentrosCostos';
 import RelacionCentroCostos from './CentroCostos';
